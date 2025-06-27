@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'appointment-service/**'
+      - '.github/workflows/deploy.yaml'
+      - 'terraform/**'
 
 jobs:
   deploy:
@@ -39,4 +43,21 @@ jobs:
           docker build -t appointment-service:latest ./appointment-service
           docker tag appointment-service:latest $ECR_REGISTRY/appointment-service:latest
           docker push $ECR_REGISTRY/appointment-service:latest
+
+      - name: ⚙️ Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: 📦 Terraform Init
+        working-directory: terraform/environments/dev
+        run: terraform init
+
+      - name: 📄 Terraform Plan
+        working-directory: terraform/environments/dev
+        run: terraform plan
+
+      - name: 🚀 Terraform Apply
+        working-directory: terraform/environments/dev
+        run: terraform apply -auto-approve
 
