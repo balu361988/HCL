@@ -8,7 +8,7 @@
   "containerDefinitions": [
     {
       "name": "patient-service",
-      "image": "373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest",
+      "image": "REPLACE_IMAGE",
       "portMappings": [
         {
           "containerPort": 80,
