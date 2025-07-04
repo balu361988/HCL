@@ -1,5 +1,6 @@
 {
   "family": "patient-task",
+  "executionRoleArn": "arn:aws:iam::373649774472:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
