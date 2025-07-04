@@ -8,7 +8,7 @@ const port = process.env.PORT || 80;
 const host = '0.0.0.0';
 
 app.get('/patient', (req, res) => {
-  res.send('✅ Patient Service running on port 80!');
+  res.send('✅ Patient Service running on port 361988!');
 });
 
 app.listen(port, host, () => {
