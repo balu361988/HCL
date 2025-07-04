@@ -1,4 +1,4 @@
-name: Build and Push Patient Service
+name: Build and Deploy Patient Service
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - 'patient-service/**'
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,15 +26,31 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker image
+      - name: Build Docker Image
         run: |
           cd patient-service
           docker build -t patient-service .
 
-      - name: Tag and Push to ECR
+      - name: Tag and Push to Amazon ECR
         run: |
           ECR_REGISTRY=373649774472.dkr.ecr.ap-south-1.amazonaws.com
           IMAGE_NAME=patient-service
           docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
           docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+
+      - name: Render Task Definition for ECS
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/patient-task-def.json
+          container-name: patient-service
+          image: 373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest
+
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          cluster: dev-ecs-cluster
+          service: patient-service
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          wait-for-service-stability: true
 
