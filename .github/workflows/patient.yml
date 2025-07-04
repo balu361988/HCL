@@ -26,25 +26,24 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker Image
+      - name: Set unique image tag using timestamp
+        id: vars
+        run: echo "TAG=build-$(date +%s)" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image to ECR
         run: |
           cd patient-service
-          docker build -t patient-service .
-
-      - name: Tag and Push to Amazon ECR
-        run: |
-          ECR_REGISTRY=373649774472.dkr.ecr.ap-south-1.amazonaws.com
-          IMAGE_NAME=patient-service
-          docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
-          docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+          docker build -t patient-service:$TAG .
+          docker tag patient-service:$TAG 373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:$TAG
+          docker push 373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:$TAG
 
       - name: Render ECS Task Definition for Patient Service
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ecs/patient-task-def.json
-          container-name: patient-service                    # ✅ FIXED NAME
-          image: 373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest
+          container-name: patient-service
+          image: 373649774472.dkr.ecr.ap-south-1.amazonaws.com/patient-service:${{ env.TAG }}
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
