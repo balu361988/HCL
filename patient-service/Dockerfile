@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-# ✅ Expose the correct port your app uses
+# ✅ Expose the correct port your app balu
 EXPOSE 80
 
 # ✅ Start the app correctly
