@@ -1,40 +1,42 @@
-name: Build and Push Appointment Service
+name: Build and Deploy Appointment Service
 
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'appointment-service/**'
+      - main  # ✅ Trigger on any push to main branch
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_URI: ${{ secrets.ECR_REPO_APPOINTMENT }}:latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin ${{ secrets.ECR_REPO_APPOINTMENT }}
 
-      - name: Build Docker image
+      - name: Build and Push Docker Image
         run: |
           cd appointment-service
-          docker build -t appointment-service .
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
 
-      - name: Tag and Push to ECR
+      - name: Force ECS Redeploy
         run: |
-          ECR_REGISTRY=373649774472.dkr.ecr.ap-south-1.amazonaws.com
-          IMAGE_NAME=appointment-service
-          docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
-          docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+          aws ecs update-service \
+            --cluster ${{ secrets.CLUSTER_NAME }} \
+            --service ${{ secrets.APPOINTMENT_SERVICE_NAME }} \
+            --force-new-deployment
 
