@@ -1,0 +1,11 @@
+name: forked-pr-test
+
+on:
+  pull_request:
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello
+        run: echo " Pull request from fork triggered this GitHub Action!"
