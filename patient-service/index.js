@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/Patient', (req, res) => {
-  res.send('Patient Service running on port !');
+  res.send('Patient Service running on port-1988 !');
 });
 
 app.listen(port, host, () => {

@@ -5,11 +5,11 @@ const port = process.env.PORT || 80;
 const host = '0.0.0.0';
 
 app.get('/', (req, res) => {
-  res.send('Welcome to Appointment Service Root1988!');
+  res.send('Welcome to Appointment Service Root!');
 });
 
 app.get('/appointment', (req, res) => {
-  res.send('Appointment Service running on port !');
+  res.send('Appointment Service running on port-1988 !');
 });
 
 app.listen(port, host, () => {
