@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/appointment', (req, res) => {
-  res.send('Appointment Service running on port-1988 !');
+  res.send('Appointment Service running on port-31988 !');
 });
 
 app.listen(port, host, () => {
