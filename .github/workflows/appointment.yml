@@ -3,7 +3,7 @@ name: Build and Deploy Appointment Service
 on:
   push:
     branches:
-      - main  # ✅ Trigger on any push to main branch
+      - master
 
 jobs:
   deploy:
